@@ -1,0 +1,47 @@
+version: "3.3"
+
+services:
+  druid-injector:
+    #network_mode: bridge
+    build: ./
+    #image: moorea/druid-injector
+    environment:
+      # GUNICORN
+      - DRUID_INJECTOR_PYTHON_PORT=5000
+      - DRUID_INJECTOR_PYTHON_GUNICORN_TIMEOUT=360
+
+      # LOGS
+      - NIVEL_LOGS=INFO
+      - DIRECTORIO_LOGS=logs/
+
+      # APP
+      - POOL_SIZE_DEFAULT=50
+      - MAX_OVERFLOW_DEFAULT=100
+      - DIRECTORY_FILES=files/
+      - DRUID_INJECTOR_ENVIRONMENT_MODE=development
+      - DRUID_INJECTOR_DRUID_HOST=mydruid
+      - DRUID_INJECTOR_DRUID_PORT=9888
+      - DRUID_INJECTOR_REDIS_HOST=redis
+      - DRUID_INJECTOR_REDIS_PORT=6379
+
+    restart: always
+    volumes:
+      - ./logs:/usr/src/logs
+      - ./files:/usr/src/files
+      - /tmp:/tmp
+      
+    ports:
+      - 50000:5000
+
+    links: 
+      - redis
+
+  redis:
+    image: redis:5.0.7
+    restart: always
+
+    volumes:
+        - ./volumes/redis/data:/data
+
+    command: redis-server --appendonly yes
+

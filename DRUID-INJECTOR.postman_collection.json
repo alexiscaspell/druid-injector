@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "ca870435-2269-4306-8e3c-e92e246a5d02",
+		"name": "DRUID-INJECTOR",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CREATE DATASOURCE",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"datasource\": \"juampi_data_18\",\n    \"base_path\": \"/tmp/druid\",\n    \"connection\": {\n        \"ip\": \"http://localhost\",\n        \"port\": 8888\n    },\n    \"timestamp_col\": \"fecha\",\n    \"metrics\": [\n        {\n            \"type\": \"count\",\n            \"name\": \"count\"\n        },\n        {\n            \"type\": \"doubleSum\",\n            \"name\": \"precios_lista\",\n            \"fieldName\": \"precio_lista\"\n        },\n        {\n            \"type\": \"doubleMin\",\n            \"name\": \"precio_lista_min\",\n            \"fieldName\": \"precio_lista\"\n        },\n        {\n            \"type\": \"doubleMax\",\n            \"name\": \"precio_lista_max\",\n            \"fieldName\": \"precio_lista\"\n        }\n    ],\n    \"origin\": {\n        \"type\": \"csv\",\n        \"metadata\": {\n            \"path\": \"/home/precios_claros/comercios_latest.csv\"\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/v1/druid/injector",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"v1",
+						"druid",
+						"injector"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DRUID CREATE",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"type\": \"index\",\n    \"spec\": {\n        \"ioConfig\": {\n            \"type\": \"index\",\n            \"firehose\": {\n                \"type\": \"local\",\n                \"baseDir\": \"/tmp/druid/\",\n                \"filter\": \"cached2020-03-18 16:23:55.961373.json\"\n            },\n            \"appendToExisting\": false\n        },\n        \"dataSchema\": {\n            \"dataSource\": \"juampi_data_18\",\n            \"granularitySpec\": {\n                \"type\": \"uniform\",\n                \"segmentGranularity\": \"day\",\n                \"queryGranularity\": \"none\",\n                \"intervals\": [\n                    \"2018-08-31/2019-05-30\"\n                ],\n                \"rollup\": true\n            },\n            \"parser\": {\n                \"type\": \"string\",\n                \"parseSpec\": {\n                    \"format\": \"json\",\n                    \"dimensionsSpec\": {\n                        \"dimensions\": [\n                            \"producto_id\",\n                            \"ean\",\n                            \"marca\",\n                            \"precio_lista\",\n                            \"descripcion\",\n                            \"precio_referencia\",\n                            \"bandera\",\n                            \"sucursal\",\n                            \"sucursal_tipo\",\n                            \"localidad\",\n                            \"provincia\",\n                            \"rubro\",\n                            \"region\",\n                            \"subcategoria\",\n                            \"categoria\",\n                            \"canal\",\n                            \"comercio\",\n                            \"fecha_str\",\n                            \"fecha_dia\",\n                            \"fecha_mes\",\n                            \"fecha_año\"\n                        ]\n                    },\n                    \"timestampSpec\": {\n                        \"format\": \"iso\",\n                        \"column\": \"fecha\"\n                    }\n                }\n            },\n            \"metricsSpec\": [\n                {\n                    \"type\": \"count\",\n                    \"name\": \"count\"\n                },\n                {\n                    \"type\": \"doubleSum\",\n                    \"name\": \"precios_lista\",\n                    \"fieldName\": \"precio_lista\"\n                },\n                {\n                    \"type\": \"doubleMin\",\n                    \"name\": \"precio_lista_min\",\n                    \"fieldName\": \"precio_lista\"\n                },\n                {\n                    \"type\": \"doubleMax\",\n                    \"name\": \"precio_lista_max\",\n                    \"fieldName\": \"precio_lista\"\n                }\n            ]\n        },\n        \"tuningConfig\": {\n            \"type\": \"index\",\n            \"maxRowsPerSegment\": 8000000,\n            \"maxRowsInMemory\": 40000,\n            \"ignoreInvalidRows\": false\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8888/druid/indexer/v1/task",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"druid",
+						"indexer",
+						"v1",
+						"task"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,0 +1,10 @@
+
+apps/utils/__pycache__/
+
+logs/
+
+*.pyc
+
+.vscode/
+
+venv/
